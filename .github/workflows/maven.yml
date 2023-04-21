@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml -Djar.finalName=tigersbot.jar
+      run: mvn -B package --file pom.xml -Djar.finalName=tigersbot
 
     - name: Create Release
       id: create_release
