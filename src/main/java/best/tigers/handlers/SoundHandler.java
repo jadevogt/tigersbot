@@ -16,7 +16,7 @@ public class SoundHandler implements MessageHandler {
         // underscores in the name will be replaced with spaces, and the name will be made all lowercase
         for (var key : environmentVariables.keySet()) {
             if (key.startsWith("SOUND_")) {
-                var soundUrl = environmentVariables.get(key).replace("\"", "");
+                var soundUrl = environmentVariables.get(key);
                 var soundName = key.split("SOUND_")[1].toLowerCase().replace("_", " ");
                 sounds.put(soundName, soundUrl);
             }
