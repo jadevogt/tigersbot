@@ -6,7 +6,7 @@
 
     <groupId>best.tigers</groupId>
     <artifactId>tigersbot</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>
@@ -60,6 +60,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>best.tigers.Main</mainClass>
                         </manifest>
                         <manifestEntries>
