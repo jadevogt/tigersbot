@@ -1,5 +1,7 @@
-package best.tigers.services;
+package best.tigers.tigersbot.services;
 
+import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
+import best.tigers.tigersbot.util.Log;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.service.OpenAiService;
 
@@ -9,14 +11,20 @@ public class CompletionService {
     private static CompletionService instance;
     private final OpenAiService api;
 
-    public static CompletionService getInstance() {
+    public static CompletionService getInstance() throws MissingEnvironmentVariableException {
         if (instance == null) {
             instance = new CompletionService();
         }
         return instance;
     }
 
-    private CompletionService() {
+    private CompletionService() throws MissingEnvironmentVariableException {
+        var variablesExist = Log.checkEnvironmentVariables(
+                "CompletionService",
+                "OPEN_AI_TOKEN");
+        if (!variablesExist) {
+            throw new MissingEnvironmentVariableException("OPEN_AI_TOKEN");
+        }
         var environmentVariables = System.getenv();
         var openAiToken = environmentVariables.get("OPEN_AI_TOKEN");
         api = new OpenAiService(openAiToken, Duration.ofSeconds(999));

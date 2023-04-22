@@ -1,5 +1,7 @@
-package best.tigers.services;
+package best.tigers.tigersbot.services;
 
+import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
+import best.tigers.tigersbot.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,13 +18,22 @@ public class ImagesService {
     private final String googleCustomSearchKey;
     private final String googleCustomSearchCx;
 
-    private ImagesService(){
+    private ImagesService() throws MissingEnvironmentVariableException {
+        var variablesExist = Log.checkEnvironmentVariables(
+                "ImagesService",
+                "GOOGLE_CUSTOM_SEARCH_CX",
+                "GOOGLE_CUSTOM_SEARCH_KEY");
+        if (!variablesExist) {
+            throw new MissingEnvironmentVariableException("GOOGLE_CUSTOM_SEARCH_CX", "GOOGLE_CUSTOM_SEARCH_KEY");
+        }
         var environmentVariables = System.getenv();
         googleCustomSearchCx = environmentVariables.get("GOOGLE_CUSTOM_SEARCH_CX");
         googleCustomSearchKey = environmentVariables.get("GOOGLE_CUSTOM_SEARCH_KEY");
-    };
+    }
 
-    public static ImagesService getInstance() {
+    ;
+
+    public static ImagesService getInstance() throws MissingEnvironmentVariableException {
         if (instance == null) {
             instance = new ImagesService();
         }
