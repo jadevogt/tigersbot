@@ -27,17 +27,19 @@ jobs:
         java-version: '19'
         distribution: 'temurin'
         cache: maven
+    - name: Get version number
+      id: get-version-number
+      run: echo "VERSION_NUMBER=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_OUTPUT"
     - name: Build with Maven
       run: mvn -B package --file pom.xml -Djar.finalName=tigersbot
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ steps.get-version-number.outputs.VERSION_NUMBER }}
+        release_name: ${{ steps.get-version-number.outputs.VERSION_NUMBER }}
         draft: false
         prerelease: false
 
