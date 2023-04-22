@@ -3,7 +3,11 @@ package best.tigers.handlers;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -11,7 +15,46 @@ import java.util.List;
 
 public class ForbiddenWordHandler implements MessageHandler {
     private static ForbiddenWordHandler instance;
-    private final HashMap<Long, List<String>> bannedWords = new HashMap<>();
+    private final HashMap<Long, List<String>> bannedWords;
+
+    private ForbiddenWordHandler() {
+        bannedWords = new HashMap<>();
+        try {
+            var environmentVariables = System.getenv();
+            var forbiddenWordsPath = environmentVariables.get("FORBIDDEN_WORDS_FILE");
+            var is = new FileInputStream(forbiddenWordsPath);
+            JSONTokener tokener = new JSONTokener(is);
+            JSONObject object = new JSONObject(tokener);
+            for (var key : object.keySet()) {
+                long longKey = Long.parseLong(key);
+                JSONArray jsonWordList = object.getJSONArray(key);
+                var wordList = new ArrayList<String>();
+                jsonWordList.toList().stream().map(Object::toString).forEach(wordList::add);
+                bannedWords.put(longKey, wordList);
+            }
+            is.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeToJsonFile() {
+        try {
+            var environmentVariables = System.getenv();
+            var forbiddenWordsPath = environmentVariables.get("FORBIDDEN_WORDS_FILE");
+            var banned = new JSONObject();
+            for (var key: bannedWords.keySet()) {
+                var array = new JSONArray();
+                array.putAll(bannedWords.get(key));
+                banned.put(key.toString(), array);
+            }
+            var writer = new FileWriter(forbiddenWordsPath);
+            writer.write(banned.toString());
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static ForbiddenWordHandler getInstance() {
         if (instance == null) {
@@ -34,6 +77,7 @@ public class ForbiddenWordHandler implements MessageHandler {
             if (!chatSpecificList.contains(cleanedMsg)) {
                 chatSpecificList.add(cleanedMsg);
                 var msg = new SendMessage(message.chat().id(), "\"" + cleanedMsg + "\" has been forbidden!");
+                writeToJsonFile();
                 bot.execute(msg);
             } else {
                 var msg = new SendMessage(message.chat().id(), "\"" + cleanedMsg + "\" is already forbidden!");
