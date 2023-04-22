@@ -1,6 +1,7 @@
 package best.tigers.tigersbot.services;
 
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
+import best.tigers.tigersbot.util.Environment;
 import best.tigers.tigersbot.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,19 +20,9 @@ public class ImagesService {
     private final String googleCustomSearchCx;
 
     private ImagesService() throws MissingEnvironmentVariableException {
-        var variablesExist = Log.checkEnvironmentVariables(
-                "ImagesService",
-                "GOOGLE_CUSTOM_SEARCH_CX",
-                "GOOGLE_CUSTOM_SEARCH_KEY");
-        if (!variablesExist) {
-            throw new MissingEnvironmentVariableException("GOOGLE_CUSTOM_SEARCH_CX", "GOOGLE_CUSTOM_SEARCH_KEY");
-        }
-        var environmentVariables = System.getenv();
-        googleCustomSearchCx = environmentVariables.get("GOOGLE_CUSTOM_SEARCH_CX");
-        googleCustomSearchKey = environmentVariables.get("GOOGLE_CUSTOM_SEARCH_KEY");
+        googleCustomSearchCx = Environment.get("GOOGLE_CUSTOM_SEARCH_CX");
+        googleCustomSearchKey = Environment.get("GOOGLE_CUSTOM_SEARCH_KEY");
     }
-
-    ;
 
     public static ImagesService getInstance() throws MissingEnvironmentVariableException {
         if (instance == null) {
@@ -41,38 +32,52 @@ public class ImagesService {
     }
 
     public String getImage(String query) {
-        try {
-            // build the URL for the Google CSE API request
-            var encodedQuery = URLEncoder.encode(query);
-            String urlStr = "https://www.googleapis.com/customsearch/v1?q=" +
-                    encodedQuery +
-                    "&cx=" +
-                    googleCustomSearchCx +
-                    "&searchType=image&key=" +
-                    googleCustomSearchKey;
+        var conn = getConnection(query);
+        if (conn == null) {
+            return "";
+        }
+        return getImageLink(conn);
+    }
 
-            // send the API request and get the response
-            URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    private HttpURLConnection getConnection(String query) {
+        HttpURLConnection connection = null;
+        URL url;
+        try {
+            url = new URL(buildUrl(query));
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+        } catch (IOException e) {
+            Log.severe(e.getMessage());
+        }
+        return connection;
+    }
+
+    private String getImageLink(HttpURLConnection conn) {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
             String inputLine;
             StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
-            in.close();
-
-            // parse the JSON response to get the URL of the first image result
             JSONObject jsonResponse = new JSONObject(response.toString());
             JSONArray items = jsonResponse.getJSONArray("items");
             JSONObject firstResult = items.getJSONObject(0);
-            String imageUrl = firstResult.getString("link");
-
-            return imageUrl;
+            return firstResult.getString("link");
         } catch (IOException | JSONException e) {
             e.printStackTrace();
             return "";
         }
+    }
+
+    private String buildUrl(String query) {
+        var encodedQuery = URLEncoder.encode(query);
+        var urlBuilder = new StringBuilder();
+        urlBuilder.append("https://www.googleapis.com/customsearch/v1?q=")
+                .append(encodedQuery)
+                .append("&cx=")
+                .append(googleCustomSearchCx)
+                .append("&searchType=image&key=")
+                .append(googleCustomSearchKey);
+        return urlBuilder.toString();
     }
 }

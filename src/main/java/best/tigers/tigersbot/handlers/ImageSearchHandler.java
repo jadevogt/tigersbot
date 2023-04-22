@@ -4,9 +4,6 @@ import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.services.ImagesService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.ChatAction;
-import com.pengrad.telegrambot.request.SendChatAction;
-import com.pengrad.telegrambot.request.SendPhoto;
 
 public class ImageSearchHandler extends MessageHandler {
     private final ImagesService imagesService;

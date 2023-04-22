@@ -2,7 +2,7 @@ package best.tigers.tigersbot.handlers;
 
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.services.PersistentStorageService;
-import best.tigers.tigersbot.util.Log;
+import best.tigers.tigersbot.util.Environment;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import org.json.JSONArray;
@@ -16,13 +16,13 @@ public class ForbiddenWordHandler extends MessageHandler {
     private final List<String> bannedWords;
     private final HashMap<String, HashMap<Long, Integer>> scoreBoard;
     private final PersistentStorageService persistentStorageService;
+    private final String wordsFile;
+    private final String scoreFile;
 
     public ForbiddenWordHandler(TelegramBot bot, long chatId) throws MissingEnvironmentVariableException {
         super(bot, chatId);
-        var varsExist = Log.checkEnvironmentVariables("ForbiddenWordHandler", "FORBIDDEN_WORDS_FILE", "FORBIDDEN_SCOREBOARD_FILE");
-        if (!varsExist) {
-            throw new MissingEnvironmentVariableException("FORBIDDEN_WORDS_FILE", "FORBIDDEN_SCOREBOARD_FILE");
-        }
+        wordsFile = Environment.get("FORBIDDEN_WORDS_FILE");
+        scoreFile = Environment.get("FORBIDDEN_SCOREBOARD_FILE");
         persistentStorageService = PersistentStorageService.getInstance();
         bannedWords = new ArrayList<>();
         loadWordsFile();
@@ -31,8 +31,7 @@ public class ForbiddenWordHandler extends MessageHandler {
     }
 
     private void loadWordsFile() {
-        var env = System.getenv();
-        var storedJson = persistentStorageService.jsonFromFile(env.get("FORBIDDEN_WORDS_FILE"));
+        var storedJson = persistentStorageService.jsonFromFile(wordsFile);
         if (storedJson.has(Long.toString(getChatId()))) {
             var storedWords = storedJson
                     .getJSONArray(Long.toString(getChatId()))
@@ -45,8 +44,7 @@ public class ForbiddenWordHandler extends MessageHandler {
     }
 
     private void loadScoreFile() {
-        var env = System.getenv();
-        var storedJson = persistentStorageService.jsonFromFile(env.get("FORBIDDEN_SCOREBOARD_FILE"));
+        var storedJson = persistentStorageService.jsonFromFile(scoreFile);
         if (storedJson == null) {
             return;
         }
@@ -65,8 +63,7 @@ public class ForbiddenWordHandler extends MessageHandler {
     }
 
     private void saveScoreFile() {
-        var env = System.getenv();
-        var storedJson = persistentStorageService.jsonFromFile(env.get("FORBIDDEN_SCOREBOARD_FILE"));
+        var storedJson = persistentStorageService.jsonFromFile(scoreFile);
         if (storedJson == null) {
             storedJson = new JSONObject();
         }
@@ -79,7 +76,7 @@ public class ForbiddenWordHandler extends MessageHandler {
             jsonOut.put(word, wordJsonOut);
         }
         storedJson.put(Long.toString(getChatId()), jsonOut);
-        persistentStorageService.jsonToFile(env.get("FORBIDDEN_SCOREBOARD_FILE"), storedJson);
+        persistentStorageService.jsonToFile(scoreFile, storedJson);
     }
 
     private int incrementScoreForUser(long userId, String word) {
@@ -108,12 +105,11 @@ public class ForbiddenWordHandler extends MessageHandler {
     }
 
     private void saveWordList() {
-        var env = System.getenv();
-        var storedJson = persistentStorageService.jsonFromFile(env.get("FORBIDDEN_WORDS_FILE"));
+        var storedJson = persistentStorageService.jsonFromFile(wordsFile);
         var storedWordsArray = new JSONArray();
         bannedWords.forEach(storedWordsArray::put);
         storedJson.put(Long.toString(getChatId()), storedWordsArray);
-        persistentStorageService.jsonToFile(env.get("FORBIDDEN_WORDS_FILE"), storedJson);
+        persistentStorageService.jsonToFile(wordsFile, storedJson);
     }
 
     @Override

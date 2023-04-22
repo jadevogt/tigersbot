@@ -8,9 +8,6 @@ import com.pengrad.telegrambot.request.SendChatAction;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 public abstract class MessageHandler {
     private final long chatId;
     private final TelegramBot bot;

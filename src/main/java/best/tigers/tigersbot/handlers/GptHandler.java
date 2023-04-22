@@ -4,9 +4,6 @@ import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.services.CompletionService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.model.request.ChatAction;
-import com.pengrad.telegrambot.request.SendChatAction;
-import com.pengrad.telegrambot.request.SendMessage;
 
 public class GptHandler extends MessageHandler {
     private final CompletionService completionService;

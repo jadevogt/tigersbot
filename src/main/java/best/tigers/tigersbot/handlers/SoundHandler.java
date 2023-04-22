@@ -2,8 +2,6 @@ package best.tigers.tigersbot.handlers;
 
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.request.SendAudio;
-import com.pengrad.telegrambot.request.SendMessage;
 import java.util.HashMap;
 
 public class SoundHandler extends MessageHandler {
