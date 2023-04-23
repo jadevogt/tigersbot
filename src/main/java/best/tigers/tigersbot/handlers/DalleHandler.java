@@ -6,6 +6,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.image.Image;
+import retrofit2.HttpException;
 
 public class DalleHandler extends MessageHandler {
     private CompletionService completionService;
@@ -24,6 +25,8 @@ public class DalleHandler extends MessageHandler {
             sendPhoto(completion.getUrl());
         } catch (OpenAiHttpException e) {
             sendMessage("The prompt \"" + prompt + "\" triggered OpenAI's content filter. Try rewording it.");
+        } catch (HttpException e) {
+            sendMessage("We're currently rate-limited by OpenAI, give it a minute.");
         }
     }
 

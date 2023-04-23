@@ -25,8 +25,12 @@ public class BotService {
         var telegramBotToken = Environment.get("TG_BOT_TOKEN");
         bot = new TelegramBot(telegramBotToken);
         bot.setUpdatesListener(updates -> {
-            for (var update : updates) {
-                processUpdate(update);
+            try {
+                for (var update : updates) {
+                    processUpdate(update);
+                }
+            } catch (Exception e) {
+                Log.severe(e.getMessage());
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         });
