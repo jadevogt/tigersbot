@@ -29,7 +29,7 @@ public class CompletionService {
         }
         var environmentVariables = System.getenv();
         var openAiToken = environmentVariables.get("OPEN_AI_TOKEN");
-        api = new OpenAiService(openAiToken, Duration.ofSeconds(999));
+        api = new OpenAiService(openAiToken, Duration.ofSeconds(30));
     }
 
     public String getCompletion(String prompt) {
