@@ -3,6 +3,8 @@ package best.tigers.tigersbot.services;
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.util.Log;
 import com.theokanning.openai.completion.CompletionRequest;
+import com.theokanning.openai.image.CreateImageRequest;
+import com.theokanning.openai.image.Image;
 import com.theokanning.openai.service.OpenAiService;
 
 import java.time.Duration;
@@ -38,6 +40,15 @@ public class CompletionService {
                 .maxTokens(Math.abs(2048 - prompt.length()))
                 .build();
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
+    }
+
+    public Image getImage(String prompt) {
+        var completionRequest = CreateImageRequest.builder()
+                .prompt(prompt)
+                .n(1)
+                .size("256x256")
+                .build();
+        return api.createImage(completionRequest).getData().get(0);
     }
 
 
