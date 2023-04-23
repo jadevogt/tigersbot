@@ -12,6 +12,6 @@ public class SoundHandlerFactory extends AbstractHandlerFactory {
     }
 
     public String getHelp() {
-        return "/sound [soundname]";
+        return "<b>/sound</b> [soundname]\n<i>send a sound from the available sound list. leave out the argument to see the sound list</i>";
     }
 }

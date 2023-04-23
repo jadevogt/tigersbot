@@ -9,6 +9,7 @@ import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import java.util.ArrayList;
@@ -67,11 +68,13 @@ public class BotService {
 
     private void sendHelpMessage(Message message) {
         var helpBuilder = new StringBuilder();
-        helpBuilder.append("Available commands:");
+        helpBuilder.append("<b>Available commands:</b>");
         handlerFactories.forEach(f -> {
             helpBuilder.append("\n").append(f.getHelp());
         });
+        helpBuilder.append("\n").append("<b>/help</b>\n<i>show this help message</i>");
         var msg = new SendMessage(message.chat().id(), helpBuilder.toString());
+        msg.parseMode(ParseMode.HTML);
         bot.execute(msg);
     }
 

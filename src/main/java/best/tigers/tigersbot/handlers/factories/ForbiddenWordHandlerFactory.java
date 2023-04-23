@@ -11,6 +11,6 @@ public class ForbiddenWordHandlerFactory extends AbstractHandlerFactory {
     }
 
     public String getHelp() {
-        return "/forbid [word]\n/unforbid [word]";
+        return "<b>/forbid</b> [word]\n<i>add a word to the forbidden word list</i>\n<b>/unforbid</b> [word]\n<i>remove a word from the forbidden word list</i>";
     }
 }

@@ -13,6 +13,6 @@ public class DalleHandlerFactory extends AbstractHandlerFactory {
 
     @Override
     public String getHelp() {
-        return "/dalle [prompt]";
+        return "<b>/dalle</b> [prompt]\n<i>generate an image with dalle</i>";
     }
 }

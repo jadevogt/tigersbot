@@ -12,6 +12,6 @@ public class QuoteHandlerFactory extends AbstractHandlerFactory {
 
     @Override
     public String getHelp() {
-        return "/vc";
+        return "<b>/vc</b>\n<i>quote from pokemon vietnamese crystal</i>";
     }
 }

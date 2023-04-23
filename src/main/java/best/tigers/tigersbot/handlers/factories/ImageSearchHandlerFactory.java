@@ -12,6 +12,6 @@ public class ImageSearchHandlerFactory extends AbstractHandlerFactory {
     }
 
     public String getHelp() {
-        return "/image [query]";
+        return "<b>/image</b> [query]\n<i>grab an image from google</i>";
     }
 }

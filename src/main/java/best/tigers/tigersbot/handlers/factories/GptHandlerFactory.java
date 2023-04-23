@@ -12,6 +12,6 @@ public class GptHandlerFactory extends AbstractHandlerFactory {
     }
 
     public String getHelp() {
-        return "/gpt [prompt]";
+        return "<b>/gpt</b> [prompt]\n<i>generate text with gpt-3</i>";
     }
 }
