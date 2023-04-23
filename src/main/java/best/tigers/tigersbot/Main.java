@@ -20,5 +20,6 @@ public class Main {
         botService.registerHandlerFactory(new SoundHandlerFactory());
         botService.registerHandlerFactory(new ImageSearchHandlerFactory());
         botService.registerHandlerFactory(new DalleHandlerFactory());
+        botService.registerHandlerFactory(new QuoteHandlerFactory());
     }
 }
