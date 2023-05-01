@@ -5,6 +5,8 @@ import best.tigers.tigersbot.services.PersistentStorageService;
 import best.tigers.tigersbot.util.Environment;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,7 +16,7 @@ import java.util.List;
 
 public class ForbiddenWordHandler extends MessageHandler {
     private final List<String> bannedWords;
-    private final HashMap<String, HashMap<Long, Integer>> scoreBoard;
+    private final ConcurrentHashMap<String, HashMap<Long, Integer>> scoreBoard;
     private final PersistentStorageService persistentStorageService;
     private final String wordsFile;
     private final String scoreFile;
@@ -24,14 +26,17 @@ public class ForbiddenWordHandler extends MessageHandler {
         wordsFile = Environment.get("FORBIDDEN_WORDS_FILE");
         scoreFile = Environment.get("FORBIDDEN_SCOREBOARD_FILE");
         persistentStorageService = PersistentStorageService.getInstance();
-        bannedWords = new ArrayList<>();
+        bannedWords = Collections.synchronizedList(new ArrayList<>());
         loadWordsFile();
-        scoreBoard = new HashMap<>();
+        scoreBoard = new ConcurrentHashMap<>();
         loadScoreFile();
     }
 
     private void loadWordsFile() {
         var storedJson = persistentStorageService.jsonFromFile(wordsFile);
+        if (storedJson == null) {
+            return;
+        }
         if (storedJson.has(Long.toString(getChatId()))) {
             var storedWords = storedJson
                     .getJSONArray(Long.toString(getChatId()))
@@ -106,6 +111,9 @@ public class ForbiddenWordHandler extends MessageHandler {
 
     private void saveWordList() {
         var storedJson = persistentStorageService.jsonFromFile(wordsFile);
+        if (storedJson == null) {
+            storedJson = new JSONObject();
+        }
         var storedWordsArray = new JSONArray();
         bannedWords.forEach(storedWordsArray::put);
         storedJson.put(Long.toString(getChatId()), storedWordsArray);

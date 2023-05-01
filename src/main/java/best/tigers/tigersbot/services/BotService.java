@@ -13,14 +13,16 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 public class BotService {
     private static BotService instance;
     private final TelegramBot bot;
-    private final WeakHashMap<Long, List<MessageHandler>> builtHandlers = new WeakHashMap<>();
-    private final List<AbstractHandlerFactory> handlerFactories = new ArrayList<>();
+    private final Map<Long, List<MessageHandler>> builtHandlers = Collections.synchronizedMap(new WeakHashMap<>());
+    private final List<AbstractHandlerFactory> handlerFactories = Collections.synchronizedList(new ArrayList<>());
 
     private BotService() throws MissingEnvironmentVariableException {
         var telegramBotToken = Environment.get("TG_BOT_TOKEN");
@@ -28,7 +30,8 @@ public class BotService {
         bot.setUpdatesListener(updates -> {
             try {
                 for (var update : updates) {
-                    processUpdate(update);
+                    var t = new Thread(() -> processUpdate(update));
+                    t.start();
                 }
             } catch (Exception e) {
                 Log.severe(e.getMessage());

@@ -5,6 +5,7 @@ import best.tigers.tigersbot.services.PersistentStorageService;
 import best.tigers.tigersbot.util.Environment;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
+import java.util.ArrayList;
 import org.json.JSONArray;
 
 import java.util.List;
@@ -21,8 +22,12 @@ public class QuoteHandler extends MessageHandler {
         quoteFileLocation = Environment.get("QUOTE_FILE_LOCATION");
         persistentStorageService = PersistentStorageService.getInstance();
         var storedJson = persistentStorageService.jsonFromFile(quoteFileLocation);
-        JSONArray storedQuotes = storedJson.getJSONArray("quotes");
-        quotes = storedQuotes.toList().stream().map(Object::toString).toList();
+        try {
+            JSONArray storedQuotes = storedJson.getJSONArray("quotes");
+            quotes = storedQuotes.toList().stream().map(Object::toString).toList();
+        } catch (NullPointerException e) {
+            quotes = List.of("no quotes loaded");
+        }
         random = new Random();
     }
 
