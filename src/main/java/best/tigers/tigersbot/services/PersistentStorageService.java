@@ -18,7 +18,7 @@ public class PersistentStorageService {
         return instance;
     }
 
-    public JSONObject jsonFromFile(String filePath) {
+    public synchronized JSONObject jsonFromFile(String filePath) {
         JSONObject jsonObject = null;
         try (FileReader reader = new FileReader(filePath)) {
             jsonObject = new JSONObject(new JSONTokener(reader));
@@ -28,7 +28,7 @@ public class PersistentStorageService {
         return jsonObject;
     }
 
-    public void jsonToFile(String filePath, JSONObject jsonObject) {
+    public synchronized void jsonToFile(String filePath, JSONObject jsonObject) {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(jsonObject.toString());
             writer.flush();
