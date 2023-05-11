@@ -42,6 +42,18 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
+    public String getCompletion(String prompt, String modelName) {
+        var completionRequest = CompletionRequest.builder()
+            .prompt(prompt)
+            .model(modelName)
+            .echo(true)
+            .maxTokens(Math.abs(2048 - prompt.length()))
+            .build();
+        return api.createCompletion(completionRequest).getChoices().get(0).getText();
+    }
+
+
+
     public Image getImage(String prompt) {
         var completionRequest = CreateImageRequest.builder()
                 .prompt(prompt)

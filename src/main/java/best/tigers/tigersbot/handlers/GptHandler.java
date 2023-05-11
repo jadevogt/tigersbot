@@ -15,6 +15,15 @@ public class GptHandler extends MessageHandler {
 
     @Override
     public void handle(Message message) {
+        if (message.text().startsWith("/gpt model=")) {
+            showTypingIndicator();
+            var input = message.text().split("/gpt model=")[1].strip();
+            var modelName = input.split(" ")[0].strip();
+            var prompt = input.split(" ")[1].strip();
+            var completion = completionService.getCompletion(prompt, modelName);
+            sendReplyMessage(message, completion);
+            return;
+        }
         showTypingIndicator();
         var prompt = message.text().split("/gpt")[1].strip();
         var completion = completionService.getCompletion(prompt);
@@ -28,6 +37,6 @@ public class GptHandler extends MessageHandler {
 
     @Override
     public String getHelp() {
-        return "/gpt [prompt]";
+        return "/gpt (model=[model name]) [prompt]";
     }
 }
