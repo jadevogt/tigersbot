@@ -6,7 +6,7 @@
 
     <groupId>best.tigers</groupId>
     <artifactId>tigersbot</artifactId>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>
