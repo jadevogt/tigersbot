@@ -58,7 +58,7 @@ public class CompletionService {
         var completionRequest = CreateImageRequest.builder()
                 .prompt(prompt)
                 .n(1)
-                .size("256x256")
+                .size("1024x1024")
                 .build();
         return api.createImage(completionRequest).getData().get(0);
     }
