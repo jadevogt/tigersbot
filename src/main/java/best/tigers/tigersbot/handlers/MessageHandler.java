@@ -55,14 +55,15 @@ public abstract class MessageHandler {
     }
 
 
-    void sendReplyMessage(int messageId, String message) {
+    SendMessage sendReplyMessage(int messageId, String message) {
         var newMessage = new SendMessage(chatId, message);
         newMessage.replyToMessageId(messageId);
         bot.execute(newMessage);
+        return newMessage;
     }
 
-    void sendReplyMessage(Message originalMessage, String message) {
-        sendReplyMessage(originalMessage.messageId(), message);
+    SendMessage sendReplyMessage(Message originalMessage, String message) {
+        return sendReplyMessage(originalMessage.messageId(), message);
     }
 
     void showTypingIndicator() {

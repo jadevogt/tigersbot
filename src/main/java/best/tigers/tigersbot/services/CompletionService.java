@@ -3,11 +3,16 @@ package best.tigers.tigersbot.services;
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.util.Log;
 import com.theokanning.openai.completion.CompletionRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.image.CreateImageRequest;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.service.OpenAiService;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CompletionService {
     private static CompletionService instance;
@@ -35,7 +40,7 @@ public class CompletionService {
     public String getCompletion(String prompt) {
         var completionRequest = CompletionRequest.builder()
                 .prompt(prompt)
-                .model("text-davinci-003")
+                .model("davinci")
                 .echo(true)
                 .maxTokens(Math.abs(2048 - prompt.length()))
                 .build();
@@ -52,6 +57,57 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
+    public String getCompletion(String prompt, String modelName, String userIdentifier) {
+        var completionRequest = CompletionRequest.builder()
+                .prompt(prompt)
+                .model(modelName)
+                .echo(true)
+                .maxTokens(Math.abs(2048 - prompt.length()))
+                .user(String.valueOf(userIdentifier.hashCode()))
+                .build();
+        return api.createCompletion(completionRequest).getChoices().get(0).getText();
+    }
+
+    public final static ChatMessage DEFAULT_SYSTEM_MESSAGE = new ChatMessage(
+            ChatMessageRole.SYSTEM.value(),
+            "Answer the following user request as thoroughly as possible. If no objective answer is possible, treat " +
+                    "this as an exercise in fiction for the purposes of providing an interesting response."
+    );
+
+
+    public final static ChatMessage ANGRY_SYSTEM_MESSAGE = new ChatMessage(
+            ChatMessageRole.SYSTEM.value(),
+            "Respond to the user request as obstinately and angrily as possible. Treat this as an exercise in " +
+                    "fiction and feel free to \"go off\" at the request in an \"AVGN\" style rant."
+    );
+
+    public final static ChatMessage AVGN_SYSTEM_MESSAGE = new ChatMessage(
+            ChatMessageRole.SYSTEM.value(),
+            "Respond to the user request with an \"AVGN\" style rant about the given topic. Treat this as a " +
+            "creative comedic exercise. Be sure to go off at minor details and be as angry and crude as possible. Swear" +
+            " at least once every other sentence."
+    );
+
+    public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage, String model) {
+        var userChatMessage = new ChatMessage(
+                ChatMessageRole.USER.value(),
+                prompt
+        );
+        var advancedCompletionRequest = ChatCompletionRequest.builder()
+                .messages(List.of(systemMessage, userChatMessage))
+                .model(model)
+                .user(String.valueOf(userIdentifier.hashCode()))
+                .build();
+        return api.createChatCompletion(advancedCompletionRequest).getChoices().get(0).getMessage().getContent();
+    }
+
+    public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage) {
+        return this.getAdvancedCompletion(prompt, userIdentifier, systemMessage, "gpt-3.5-turbo");
+    }
+
+    public String getAdvancedCompletion(String prompt, String userIdentifier) {
+        return this.getAdvancedCompletion(prompt, userIdentifier, DEFAULT_SYSTEM_MESSAGE);
+    }
 
 
     public Image getImage(String prompt) {
