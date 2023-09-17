@@ -2,6 +2,7 @@ package best.tigers.tigersbot.services;
 
 import best.tigers.tigersbot.util.Log;
 import co.elastic.apm.api.CaptureSpan;
+import co.elastic.apm.api.ElasticApm;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -19,24 +20,39 @@ public class PersistentStorageService {
         return instance;
     }
 
-    @CaptureSpan(type = "io", subtype = "filesystem", action = "read")
     public synchronized JSONObject jsonFromFile(String filePath) {
-        JSONObject jsonObject = null;
-        try (FileReader reader = new FileReader(filePath)) {
-            jsonObject = new JSONObject(new JSONTokener(reader));
-        } catch (IOException e) {
-            Log.severe(e.getMessage());
+        var span = ElasticApm.currentTransaction().startSpan("io", "filesystem", "read");
+        try {
+            JSONObject jsonObject = null;
+            try (FileReader reader = new FileReader(filePath)) {
+                jsonObject = new JSONObject(new JSONTokener(reader));
+            } catch (IOException e) {
+                Log.severe(e.getMessage());
+            }
+            return jsonObject;
+        } catch (Throwable e) {
+            span.captureException(e);
+            throw e;
+        } finally {
+            span.end();
         }
-        return jsonObject;
     }
 
-    @CaptureSpan(type = "io", subtype = "filesystem", action = "write")
     public synchronized void jsonToFile(String filePath, JSONObject jsonObject) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write(jsonObject.toString());
-            writer.flush();
-        } catch (Exception e) {
-            Log.severe(e.getMessage());
+        var span = ElasticApm.currentTransaction().startSpan("io", "filesystem", "write");
+        try {
+            try (FileWriter writer = new FileWriter(filePath)) {
+                writer.write(jsonObject.toString());
+                writer.flush();
+            } catch (Exception e) {
+                Log.severe(e.getMessage());
+            }
+        } catch (Throwable e) {
+            span.captureException(e);
+            throw e;
+        } finally {
+            span.end();
         }
     }
+
 }

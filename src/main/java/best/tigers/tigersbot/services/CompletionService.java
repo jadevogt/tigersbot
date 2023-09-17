@@ -3,6 +3,7 @@ package best.tigers.tigersbot.services;
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.util.Log;
 import co.elastic.apm.api.CaptureSpan;
+import co.elastic.apm.api.ElasticApm;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -92,18 +93,25 @@ public class CompletionService {
             " at least once every other sentence."
     );
 
-    @CaptureSpan(type = "external", subtype = "openai", action = "chatcompletion")
     public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage, String model) {
-        var userChatMessage = new ChatMessage(
-                ChatMessageRole.USER.value(),
-                prompt
-        );
-        var advancedCompletionRequest = ChatCompletionRequest.builder()
-                .messages(List.of(systemMessage, userChatMessage))
-                .model(model)
-                .user(String.valueOf(userIdentifier.hashCode()))
-                .build();
-        return api.createChatCompletion(advancedCompletionRequest).getChoices().get(0).getMessage().getContent();
+        var span = ElasticApm.currentTransaction().startSpan("external", "openai", "chatcompletion");
+        try {
+            var userChatMessage = new ChatMessage(
+                    ChatMessageRole.USER.value(),
+                    prompt
+            );
+            var advancedCompletionRequest = ChatCompletionRequest.builder()
+                    .messages(List.of(systemMessage, userChatMessage))
+                    .model(model)
+                    .user(String.valueOf(userIdentifier.hashCode()))
+                    .build();
+            return api.createChatCompletion(advancedCompletionRequest).getChoices().get(0).getMessage().getContent();
+        } catch (Throwable e) {
+            span.captureException(e);
+            throw e;
+        } finally {
+            span.end();
+        }
     }
 
     public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage) {
@@ -115,14 +123,21 @@ public class CompletionService {
     }
 
 
-    @CaptureSpan(type = "external", subtype = "openai", action = "imagecompletion")
     public Image getImage(String prompt) {
-        var completionRequest = CreateImageRequest.builder()
-                .prompt(prompt)
-                .n(1)
-                .size("1024x1024")
-                .build();
-        return api.createImage(completionRequest).getData().get(0);
+        var span = ElasticApm.currentTransaction().startSpan("external", "openai", "imagecompletion");
+        try {
+            var completionRequest = CreateImageRequest.builder()
+                    .prompt(prompt)
+                    .n(1)
+                    .size("1024x1024")
+                    .build();
+            return api.createImage(completionRequest).getData().get(0);
+        } catch (Throwable e) {
+            span.captureException(e);
+            throw e;
+        } finally {
+            span.end();
+        }
     }
 
 

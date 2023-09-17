@@ -4,6 +4,7 @@ import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.util.Environment;
 import best.tigers.tigersbot.util.Log;
 import co.elastic.apm.api.CaptureSpan;
+import co.elastic.apm.api.ElasticApm;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,13 +33,20 @@ public class ImagesService {
         return instance;
     }
 
-    @CaptureSpan(type = "external", subtype = "googleimages", action = "query")
     public String getImage(String query) {
-        var conn = getConnection(query);
-        if (conn == null) {
-            return "";
+        var span = ElasticApm.currentTransaction().startSpan("external", "googleimages", "query");
+        try {
+            var conn = getConnection(query);
+            if (conn == null) {
+                return "";
+            }
+            return getImageLink(conn);
+        } catch (Throwable e) {
+            span.captureException(e);
+            throw e;
+        } finally {
+            span.end();
         }
-        return getImageLink(conn);
     }
 
     private HttpURLConnection getConnection(String query) {

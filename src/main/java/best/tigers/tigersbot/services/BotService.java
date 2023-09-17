@@ -56,7 +56,7 @@ public class BotService {
             if (handler.invokationTest(message)) {
                 Transaction transaction = ElasticApm.startTransaction();
                 try {
-                    transaction.setName(handler.getClass().getName());
+                    transaction.setName(handler.getClass().getSimpleName());
                     transaction.setType(Transaction.TYPE_REQUEST);
                     handler.handle(message);
                 } catch (Throwable e) {
