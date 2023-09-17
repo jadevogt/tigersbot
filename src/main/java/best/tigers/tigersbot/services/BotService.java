@@ -52,6 +52,10 @@ public class BotService {
             sendHelpMessage(message);
             return;
         }
+        if (message.text().equals("/leaderboard")) {
+            sendLeaderboardMessage(message);
+            return;
+        }
         var handlers = getHandlers(message);
         for (var handler : handlers) {
             if (handler.invokationTest(message)) {
@@ -94,9 +98,16 @@ public class BotService {
         handlerFactories.forEach(f -> {
             helpBuilder.append("\n").append(f.getHelp());
         });
+        helpBuilder.append("\n").append("<b>/leaderboard</b>\n<i>get the leaderboard link</i>");
         helpBuilder.append("\n").append("<b>/help</b>\n<i>show this help message</i>");
         var msg = new SendMessage(message.chat().id(), helpBuilder.toString());
         msg.parseMode(ParseMode.HTML);
+        bot.execute(msg);
+    }
+
+    private void sendLeaderboardMessage(Message message) {
+        var leaderboardUrl = "https://kibana.tigers.best:8443/s/public/app/dashboards?auth_provider_hint=anonymous1#/view/7e1165b7-624c-4e14-8c38-ca26b0a69dcd?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-1y%2Fd%2Cto%3Anow))";
+        var msg = new SendMessage(message.chat().id(), leaderboardUrl);
         bot.execute(msg);
     }
 
