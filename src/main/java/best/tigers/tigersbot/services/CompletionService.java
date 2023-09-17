@@ -2,6 +2,7 @@ package best.tigers.tigersbot.services;
 
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.util.Log;
+import co.elastic.apm.api.CaptureSpan;
 import com.theokanning.openai.completion.CompletionRequest;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
@@ -37,6 +38,7 @@ public class CompletionService {
         api = new OpenAiService(openAiToken, Duration.ofSeconds(999));
     }
 
+    @CaptureSpan(type = "external", subtype = "openai", action = "completion")
     public String getCompletion(String prompt) {
         var completionRequest = CompletionRequest.builder()
                 .prompt(prompt)
@@ -47,6 +49,7 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
+    @CaptureSpan(type = "external", subtype = "openai", action = "completion")
     public String getCompletion(String prompt, String modelName) {
         var completionRequest = CompletionRequest.builder()
             .prompt(prompt)
@@ -57,6 +60,7 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
+    @CaptureSpan(type = "external", subtype = "openai", action = "completion")
     public String getCompletion(String prompt, String modelName, String userIdentifier) {
         var completionRequest = CompletionRequest.builder()
                 .prompt(prompt)
@@ -88,6 +92,7 @@ public class CompletionService {
             " at least once every other sentence."
     );
 
+    @CaptureSpan(type = "external", subtype = "openai", action = "chatcompletion")
     public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage, String model) {
         var userChatMessage = new ChatMessage(
                 ChatMessageRole.USER.value(),
@@ -110,6 +115,7 @@ public class CompletionService {
     }
 
 
+    @CaptureSpan(type = "external", subtype = "openai", action = "imagecompletion")
     public Image getImage(String prompt) {
         var completionRequest = CreateImageRequest.builder()
                 .prompt(prompt)

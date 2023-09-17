@@ -1,6 +1,7 @@
 package best.tigers.tigersbot.services;
 
 import best.tigers.tigersbot.util.Log;
+import co.elastic.apm.api.CaptureSpan;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -18,6 +19,7 @@ public class PersistentStorageService {
         return instance;
     }
 
+    @CaptureSpan(type = "io", subtype = "filesystem", action = "read")
     public synchronized JSONObject jsonFromFile(String filePath) {
         JSONObject jsonObject = null;
         try (FileReader reader = new FileReader(filePath)) {
@@ -28,6 +30,7 @@ public class PersistentStorageService {
         return jsonObject;
     }
 
+    @CaptureSpan(type = "io", subtype = "filesystem", action = "write")
     public synchronized void jsonToFile(String filePath, JSONObject jsonObject) {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(jsonObject.toString());

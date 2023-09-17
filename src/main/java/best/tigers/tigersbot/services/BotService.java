@@ -5,6 +5,8 @@ import best.tigers.tigersbot.handlers.MessageHandler;
 import best.tigers.tigersbot.handlers.factories.AbstractHandlerFactory;
 import best.tigers.tigersbot.util.Environment;
 import best.tigers.tigersbot.util.Log;
+import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Transaction;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
@@ -49,7 +51,21 @@ public class BotService {
             sendHelpMessage(message);
             return;
         }
-        getHandlers(message).stream().filter(h -> h.invokationTest(message)).forEach(h -> h.handle(message));
+        var handlers = getHandlers(message);
+        for (var handler : handlers) {
+            if (handler.invokationTest(message)) {
+                Transaction transaction = ElasticApm.startTransaction();
+                try {
+                    transaction.setName(handler.getClass().getName());
+                    transaction.setType(Transaction.TYPE_REQUEST);
+                    handler.handle(message);
+                } catch (Throwable e) {
+                    transaction.captureException(e);
+                } finally {
+                    transaction.end();
+                }
+            }
+        }
     }
 
     private List<MessageHandler> getHandlers(Message message) {
