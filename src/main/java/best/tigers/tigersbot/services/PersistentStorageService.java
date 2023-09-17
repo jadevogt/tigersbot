@@ -23,6 +23,8 @@ public class PersistentStorageService {
     public synchronized JSONObject jsonFromFile(String filePath) {
         var span = ElasticApm.currentTransaction().startSpan("io", "filesystem", "read");
         try {
+            span.setName("Get JSON from File");
+            span.setLabel("path", filePath);
             JSONObject jsonObject = null;
             try (FileReader reader = new FileReader(filePath)) {
                 jsonObject = new JSONObject(new JSONTokener(reader));
@@ -41,6 +43,8 @@ public class PersistentStorageService {
     public synchronized void jsonToFile(String filePath, JSONObject jsonObject) {
         var span = ElasticApm.currentTransaction().startSpan("io", "filesystem", "write");
         try {
+            span.setName("Write JSON to File");
+            span.setLabel("path", filePath);
             try (FileWriter writer = new FileWriter(filePath)) {
                 writer.write(jsonObject.toString());
                 writer.flush();

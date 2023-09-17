@@ -36,6 +36,7 @@ public class ImagesService {
     public String getImage(String query) {
         var span = ElasticApm.currentTransaction().startSpan("external", "googleimages", "query");
         try {
+            span.setName("Get Google Image");
             var conn = getConnection(query);
             if (conn == null) {
                 return "";

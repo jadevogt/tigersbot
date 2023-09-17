@@ -39,7 +39,6 @@ public class CompletionService {
         api = new OpenAiService(openAiToken, Duration.ofSeconds(999));
     }
 
-    @CaptureSpan(type = "external", subtype = "openai", action = "completion")
     public String getCompletion(String prompt) {
         var completionRequest = CompletionRequest.builder()
                 .prompt(prompt)
@@ -50,7 +49,6 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
-    @CaptureSpan(type = "external", subtype = "openai", action = "completion")
     public String getCompletion(String prompt, String modelName) {
         var completionRequest = CompletionRequest.builder()
             .prompt(prompt)
@@ -61,7 +59,6 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
-    @CaptureSpan(type = "external", subtype = "openai", action = "completion")
     public String getCompletion(String prompt, String modelName, String userIdentifier) {
         var completionRequest = CompletionRequest.builder()
                 .prompt(prompt)
@@ -96,6 +93,7 @@ public class CompletionService {
     public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage, String model) {
         var span = ElasticApm.currentTransaction().startSpan("external", "openai", "chatcompletion");
         try {
+            span.setName("Get Chat Completion");
             var userChatMessage = new ChatMessage(
                     ChatMessageRole.USER.value(),
                     prompt
@@ -126,6 +124,7 @@ public class CompletionService {
     public Image getImage(String prompt) {
         var span = ElasticApm.currentTransaction().startSpan("external", "openai", "imagecompletion");
         try {
+            span.setName("Get Image Completion");
             var completionRequest = CreateImageRequest.builder()
                     .prompt(prompt)
                     .n(1)
