@@ -2,6 +2,7 @@ package best.tigers.tigersbot.handlers;
 
 import best.tigers.tigersbot.error.MissingEnvironmentVariableException;
 import best.tigers.tigersbot.services.CompletionService;
+import co.elastic.apm.api.ElasticApm;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 
@@ -25,10 +26,18 @@ public class GptHandler extends MessageHandler {
             return;
         }
         if (message.text().startsWith("/gpt4 ")) {
-            showTypingIndicator();
-            var prompt = message.text().split("/gpt4 ")[1].strip();
-            var completion = completionService.getAdvancedCompletion(prompt, message.from().username());
-            sendReplyMessage(message, completion);
+            var span = ElasticApm.currentTransaction().startSpan("external", "openai", "chatcompletion");
+            try {
+                showTypingIndicator();
+                var prompt = message.text().split("/gpt4 ")[1].strip();
+                var completion = completionService.getAdvancedCompletion(prompt, message.from().username());
+                sendReplyMessage(message, completion);
+            } catch (Throwable e) {
+                span.captureException(e);
+                throw e;
+            } finally {
+                span.end();
+            }
             return;
         }
         if (message.text().startsWith("/pissed ")) {
