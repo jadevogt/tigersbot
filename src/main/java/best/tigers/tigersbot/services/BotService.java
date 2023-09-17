@@ -106,7 +106,7 @@ public class BotService {
     }
 
     private void sendLeaderboardMessage(Message message) {
-        var leaderboardUrl = "https://kibana.tigers.best:8443/s/public/app/dashboards?auth_provider_hint=anonymous1#/view/7e1165b7-624c-4e14-8c38-ca26b0a69dcd?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-1y%2Fd%2Cto%3Anow))";
+        var leaderboardUrl = "https://kibana.tigers.best:8443/s/public/app/dashboards?auth_provider_hint=anonymous1#/view/54446128-167f-4394-8497-eb185f0c33ce?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-1y%2Fd%2Cto%3Anow))";
         var msg = new SendMessage(message.chat().id(), leaderboardUrl);
         bot.execute(msg);
     }
