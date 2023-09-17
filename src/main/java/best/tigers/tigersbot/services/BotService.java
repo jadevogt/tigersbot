@@ -6,6 +6,7 @@ import best.tigers.tigersbot.handlers.factories.AbstractHandlerFactory;
 import best.tigers.tigersbot.util.Environment;
 import best.tigers.tigersbot.util.Log;
 import co.elastic.apm.api.ElasticApm;
+import co.elastic.apm.api.Scope;
 import co.elastic.apm.api.Transaction;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -55,7 +56,7 @@ public class BotService {
         for (var handler : handlers) {
             if (handler.invokationTest(message)) {
                 Transaction transaction = ElasticApm.startTransaction();
-                try {
+                try (Scope scope = transaction.activate()){
                     transaction.setName(handler.getClass().getSimpleName());
                     transaction.setType(Transaction.TYPE_REQUEST);
                     handler.handle(message);
