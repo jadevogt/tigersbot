@@ -37,11 +37,14 @@ public class ImagesService {
         var span = ElasticApm.currentTransaction().startSpan("external", "googleimages", "query");
         try {
             span.setName("Get Google Image");
+            span.setLabel("image_query", query);
             var conn = getConnection(query);
             if (conn == null) {
                 return "";
             }
-            return getImageLink(conn);
+            String imageLink = getImageLink(conn);
+            span.setLabel("image_link", imageLink);
+            return imageLink;
         } catch (Throwable e) {
             span.captureException(e);
             throw e;

@@ -59,6 +59,8 @@ public class BotService {
                 try (Scope scope = transaction.activate()){
                     transaction.setName(handler.getClass().getSimpleName());
                     transaction.setType(Transaction.TYPE_REQUEST);
+                    transaction.setLabel("username", message.from().username());
+                    transaction.setLabel("message_body", message.text());
                     handler.handle(message);
                 } catch (Throwable e) {
                     transaction.captureException(e);

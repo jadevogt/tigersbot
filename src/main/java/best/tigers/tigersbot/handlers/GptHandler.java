@@ -26,18 +26,10 @@ public class GptHandler extends MessageHandler {
             return;
         }
         if (message.text().startsWith("/gpt4 ")) {
-            var span = ElasticApm.currentTransaction().startSpan("external", "openai", "chatcompletion");
-            try {
-                showTypingIndicator();
-                var prompt = message.text().split("/gpt4 ")[1].strip();
-                var completion = completionService.getAdvancedCompletion(prompt, message.from().username());
-                sendReplyMessage(message, completion);
-            } catch (Throwable e) {
-                span.captureException(e);
-                throw e;
-            } finally {
-                span.end();
-            }
+            showTypingIndicator();
+            var prompt = message.text().split("/gpt4 ")[1].strip();
+            var completion = completionService.getAdvancedCompletion(prompt, message.from().username());
+            sendReplyMessage(message, completion);
             return;
         }
         if (message.text().startsWith("/pissed ")) {
