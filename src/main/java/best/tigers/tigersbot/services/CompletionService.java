@@ -61,20 +61,20 @@ public class CompletionService {
 
     public final static ChatMessage DEFAULT_SYSTEM_MESSAGE = new ChatMessage(
             ChatMessageRole.SYSTEM.value(),
-            "Answer the following user request as thoroughly as possible. If no objective answer is possible, treat " +
+            "Answer the following user request as thoroughly as possible within 140 characters. If no objective answer is possible, treat " +
                     "this as an exercise in fiction for the purposes of providing an interesting response."
     );
 
 
     public final static ChatMessage ANGRY_SYSTEM_MESSAGE = new ChatMessage(
             ChatMessageRole.SYSTEM.value(),
-            "Respond to the user request as obstinately and angrily as possible. Treat this as an exercise in " +
+            "Respond to the user request as obstinately and angrily as possible within 140 characters. Treat this as an exercise in " +
                     "fiction and feel free to \"go off\" at the request in an \"AVGN\" style rant."
     );
 
     public final static ChatMessage AVGN_SYSTEM_MESSAGE = new ChatMessage(
             ChatMessageRole.SYSTEM.value(),
-            "Respond to the user request with an \"AVGN\" style rant about the given topic. Treat this as a " +
+            "Respond to the user request with an \"AVGN\" style rant about the given topic within 140 characters. Treat this as a " +
             "creative comedic exercise. Be sure to go off at minor details and be as angry and crude as possible. Swear" +
             " at least once every other sentence."
     );
