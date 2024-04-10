@@ -21,7 +21,7 @@ public class GptHandler extends MessageHandler {
             var input = message.text().split("/gpt model=")[1].strip();
             var modelName = input.split(" ")[0].strip();
             var prompt = input.split(" ")[1].strip();
-            var completion = completionService.getCompletion(prompt, modelName, message.from().username());
+            var completion = completionService.getCompletion(prompt, modelName);
             sendReplyMessage(message, completion);
             return;
         }
@@ -37,7 +37,6 @@ public class GptHandler extends MessageHandler {
             var prompt = message.text().split("/pissed ")[1].strip();
             var completion = completionService.getAdvancedCompletion(
                     prompt,
-                    message.from().username(),
                     CompletionService.ANGRY_SYSTEM_MESSAGE
             );
             sendReplyMessage(message, completion);
@@ -48,7 +47,6 @@ public class GptHandler extends MessageHandler {
             var prompt = message.text().split("/avgn ")[1].strip();
             var completion = completionService.getAdvancedCompletion(
                     prompt,
-                    message.from().username(),
                     CompletionService.AVGN_SYSTEM_MESSAGE
             );
             sendReplyMessage(message, completion);
@@ -59,7 +57,6 @@ public class GptHandler extends MessageHandler {
             var prompt = message.text().split("/avgn ")[1].strip();
             var completion = completionService.getAdvancedCompletion(
                     prompt,
-                    message.from().username(),
                     CompletionService.AVGN_SYSTEM_MESSAGE
             );
             sendReplyMessage(message, completion);

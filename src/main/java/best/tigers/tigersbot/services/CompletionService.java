@@ -59,17 +59,6 @@ public class CompletionService {
         return api.createCompletion(completionRequest).getChoices().get(0).getText();
     }
 
-    public String getCompletion(String prompt, String modelName, String userIdentifier) {
-        var completionRequest = CompletionRequest.builder()
-                .prompt(prompt)
-                .model(modelName)
-                .echo(true)
-                .maxTokens(Math.abs(2048 - prompt.length()))
-                .user(String.valueOf(userIdentifier.hashCode()))
-                .build();
-        return api.createCompletion(completionRequest).getChoices().get(0).getText();
-    }
-
     public final static ChatMessage DEFAULT_SYSTEM_MESSAGE = new ChatMessage(
             ChatMessageRole.SYSTEM.value(),
             "Answer the following user request as thoroughly as possible. If no objective answer is possible, treat " +
@@ -90,7 +79,7 @@ public class CompletionService {
             " at least once every other sentence."
     );
 
-    public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage, String model) {
+    public String getAdvancedCompletion(String prompt, ChatMessage systemMessage, String model) {
         var span = ElasticApm.currentTransaction().startSpan("external", "openai", "chatcompletion");
         try {
             span.setName("Get Chat Completion");
@@ -101,7 +90,6 @@ public class CompletionService {
             var advancedCompletionRequest = ChatCompletionRequest.builder()
                     .messages(List.of(systemMessage, userChatMessage))
                     .model(model)
-                    .user(String.valueOf(userIdentifier.hashCode()))
                     .build();
             return api.createChatCompletion(advancedCompletionRequest).getChoices().get(0).getMessage().getContent();
         } catch (Throwable e) {
@@ -112,12 +100,12 @@ public class CompletionService {
         }
     }
 
-    public String getAdvancedCompletion(String prompt, String userIdentifier, ChatMessage systemMessage) {
-        return this.getAdvancedCompletion(prompt, userIdentifier, systemMessage, "gpt-3.5-turbo");
+    public String getAdvancedCompletion(String prompt, ChatMessage systemMessage) {
+        return this.getAdvancedCompletion(prompt, systemMessage, "gpt-3.5-turbo");
     }
 
     public String getAdvancedCompletion(String prompt, String userIdentifier) {
-        return this.getAdvancedCompletion(prompt, userIdentifier, DEFAULT_SYSTEM_MESSAGE);
+        return this.getAdvancedCompletion(prompt, DEFAULT_SYSTEM_MESSAGE);
     }
 
 
